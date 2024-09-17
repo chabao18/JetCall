@@ -1,0 +1,66 @@
+# IntelliJ IDEA specific files
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+target/
+
+# Maven specific files
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+**/mvnw
+**/mvnw.cmd
+
+# Gradle specific files
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Logs
+logs/
+*.log
+
+# Compiled class files
+*.class
+
+# Generated files
+*.jar
+*.war
+*.ear
+
+# MacOS specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Icon must end with two \r
+Icon
+
+# The networked filesystems
+.Spotlight-V100
+.Trashes
+
+# Temporary files created by macOS
+*.swp
+*.swo
+*.swn
+*.bak
+
+# IntelliJ IDEA Plugin specific files
+.idea_modules/
+
+# User-specific files
+*.user
+*.sublime-workspace
+*.sublime-project
+
+# Project-specific directory
+bin/
+gen/
+
+# Ignore generated code
+generated/
