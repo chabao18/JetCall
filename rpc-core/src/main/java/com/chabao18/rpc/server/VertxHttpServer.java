@@ -12,14 +12,17 @@ public class VertxHttpServer implements HttpServer {
         io.vertx.core.http.HttpServer server = vertx.createHttpServer();
 
         //handle request
-        server.requestHandler(request -> {
-            // handle http request
-            log.info("Received request: {} {}", request.method(), request.uri());
+//        server.requestHandler(request -> {
+//            // handle http request
+//            log.info("Received request: {} {}", request.method(), request.uri());
+//
+//            // send http response
+//            request.response().putHeader("content-type", "text/plain")
+//                    .end("Hello from Vert.x HTTP server!");
+//        });
 
-            // send http response
-            request.response().putHeader("content-type", "text/plain")
-                    .end("Hello from Vert.x HTTP server!");
-        });
+        // handle request using HttpServerHandler
+        server.requestHandler(new HttpServerHandler());
 
         // start http server and listen on port
         server.listen(port, result -> {
@@ -29,9 +32,5 @@ public class VertxHttpServer implements HttpServer {
                 log.info("Fail to start server: {}", result.cause());
             }
         });
-    }
-
-    public static void main(String[] args) {
-        log.info("hello world test test2");
     }
 }
