@@ -2,7 +2,9 @@ package com.chaobao18.consumer;
 
 import com.chabao18.common.model.User;
 import com.chabao18.common.service.UserService;
+import com.chabao18.rpc.config.RPCConfig;
 import com.chabao18.rpc.proxy.ServiceProxyFactory;
+import com.chabao18.rpc.utils.ConfigUtils;
 
 public class ConsumerExample {
     public static void main(String[] args) {
@@ -17,5 +19,7 @@ public class ConsumerExample {
         } else {
             System.out.println("user == null");
         }
+
+        System.out.println(userService.getNumber());;
     }
 }
