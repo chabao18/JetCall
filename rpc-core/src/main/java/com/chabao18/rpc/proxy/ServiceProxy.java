@@ -2,10 +2,12 @@ package com.chabao18.rpc.proxy;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import com.chabao18.rpc.RPCApplication;
 import com.chabao18.rpc.model.RPCRequest;
 import com.chabao18.rpc.model.RPCResponse;
 import com.chabao18.rpc.serializer.JDKSerializer;
 import com.chabao18.rpc.serializer.Serializer;
+import com.chabao18.rpc.serializer.SerializerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
@@ -15,7 +17,7 @@ public class ServiceProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // choose serializer
-        Serializer serializer = new JDKSerializer();
+        final Serializer serializer = SerializerFactory.getInstance(RPCApplication.getRpcConfig().getSerializer());
 
         // make request
         RPCRequest rpcRequest = RPCRequest.builder()

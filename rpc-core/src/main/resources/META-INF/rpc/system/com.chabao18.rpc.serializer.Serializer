@@ -1,0 +1,2 @@
+jdk=com.chabao18.rpc.serializer.JDKSerializer
+hessian=com.chabao18.rpc.serializer.HessianSerializer
