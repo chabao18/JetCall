@@ -1,10 +1,12 @@
 package com.chabao18.rpc.server;
 
+import com.chabao18.rpc.RPCApplication;
 import com.chabao18.rpc.model.RPCRequest;
 import com.chabao18.rpc.model.RPCResponse;
 import com.chabao18.rpc.registry.LocalRegistry;
 import com.chabao18.rpc.serializer.JDKSerializer;
 import com.chabao18.rpc.serializer.Serializer;
+import com.chabao18.rpc.serializer.SerializerFactory;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
@@ -19,7 +21,7 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
     @Override
     public void handle(HttpServerRequest request) {
         // choose serializer
-        final Serializer serializer = new JDKSerializer();
+        final Serializer serializer = SerializerFactory.getInstance(RPCApplication.getRpcConfig().getSerializer());
 
         log.info("Received request: {} {}", request.method(), request.uri());
 
