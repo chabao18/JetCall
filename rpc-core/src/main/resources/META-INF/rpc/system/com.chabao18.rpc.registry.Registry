@@ -1,0 +1,1 @@
+zookeeper=com.chabao18.rpc.registry.ZooKeeperRegistry

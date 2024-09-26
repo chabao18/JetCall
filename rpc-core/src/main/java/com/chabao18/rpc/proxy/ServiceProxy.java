@@ -5,6 +5,7 @@ import cn.hutool.http.HttpResponse;
 import com.chabao18.rpc.RPCApplication;
 import com.chabao18.rpc.model.RPCRequest;
 import com.chabao18.rpc.model.RPCResponse;
+import com.chabao18.rpc.model.ServiceMetaInfo;
 import com.chabao18.rpc.serializer.JDKSerializer;
 import com.chabao18.rpc.serializer.Serializer;
 import com.chabao18.rpc.serializer.SerializerFactory;
@@ -19,6 +20,7 @@ public class ServiceProxy implements InvocationHandler {
         // choose serializer
         final Serializer serializer = SerializerFactory.getInstance(RPCApplication.getRpcConfig().getSerializer());
 
+        String serviceName = method.getDeclaringClass().getName();
         // make request
         RPCRequest rpcRequest = RPCRequest.builder()
                 .serviceName(method.getDeclaringClass().getName())
