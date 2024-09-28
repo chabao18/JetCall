@@ -1,1 +1,2 @@
 zookeeper=com.chabao18.rpc.registry.ZooKeeperRegistry
+etcd=com.chabao18.rpc.registry.EtcdRegistry

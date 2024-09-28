@@ -11,7 +11,7 @@ public class ServiceMetaInfo {
 
     private String serviceHost;
 
-    private String servicePort;
+    private Integer servicePort;
 
     private String serviceGroup = "default";
 
