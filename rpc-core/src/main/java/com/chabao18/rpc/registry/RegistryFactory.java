@@ -7,7 +7,7 @@ public class RegistryFactory {
         SPILoader.load(Registry.class);
     }
 
-    private static final Registry DEFAULT_REGISTRY = new ZooKeeperRegistry();
+    private static final Registry DEFAULT_REGISTRY = new EtcdRegistry();
 
     public static Registry getInstance(String key) {
         return SPILoader.getInstance(Registry.class, key);
