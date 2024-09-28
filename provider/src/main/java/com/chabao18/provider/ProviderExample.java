@@ -16,7 +16,11 @@ public class ProviderExample {
         // init rpc
         RPCApplication.init();
 
+        // register service
         String serviceName = UserService.class.getName();
+        LocalRegistry.register(UserService.class.getName(), UserServiceImpl.class);
+
+        // init registry
         RPCConfig rpcConfig = RPCApplication.getRpcConfig();
         RegistryConfig registryConfig = rpcConfig.getRegistryConfig();
         Registry registry = RegistryFactory.getInstance(registryConfig.getRegistry());

@@ -14,12 +14,14 @@ import com.chabao18.rpc.registry.RegistryFactory;
 import com.chabao18.rpc.serializer.JDKSerializer;
 import com.chabao18.rpc.serializer.Serializer;
 import com.chabao18.rpc.serializer.SerializerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.List;
 
+@Slf4j
 public class ServiceProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -43,6 +45,8 @@ public class ServiceProxy implements InvocationHandler {
             ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
             serviceMetaInfo.setServiceName(serviceName);
             serviceMetaInfo.setServiceVersion(RPCConstant.DEFAULT_SERVICE_VERSION);
+            // fix bug
+            log.info("service key: {}", serviceMetaInfo.getServiceKey());
             List<ServiceMetaInfo> serviceMetaInfoList = registry.serviceDiscovery(serviceMetaInfo.getServiceKey());
             if (CollUtil.isEmpty(serviceMetaInfoList)) {
                 throw new RuntimeException("暂无服务地址");

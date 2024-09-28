@@ -6,12 +6,14 @@ import com.chabao18.rpc.model.ServiceMetaInfo;
 import io.etcd.jetcd.*;
 import io.etcd.jetcd.options.GetOption;
 import io.etcd.jetcd.options.PutOption;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class EtcdRegistry implements Registry {
 
     private Client client;
@@ -38,6 +40,7 @@ public class EtcdRegistry implements Registry {
         long leaseId = leaseClient.grant(30).get().getID();
 
         // 设置要存储的键值对
+        // fix bug
         String registerKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
         ByteSequence key = ByteSequence.from(registerKey, StandardCharsets.UTF_8);
         ByteSequence value = ByteSequence.from(JSONUtil.toJsonStr(serviceMetaInfo), StandardCharsets.UTF_8);
@@ -45,17 +48,26 @@ public class EtcdRegistry implements Registry {
         // 将键值对与租约关联起来，并设置过期时间
         PutOption putOption = PutOption.builder().withLeaseId(leaseId).build();
         kvClient.put(key, value, putOption).get();
+        log.info("register K:{} - V{}", registerKey, JSONUtil.toJsonStr(serviceMetaInfo));
+
     }
 
     @Override
     public void unRegister(ServiceMetaInfo serviceMetaInfo) {
-        kvClient.delete(ByteSequence.from(ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey(), StandardCharsets.UTF_8));
+        String unregisterKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
+        log.info("unregister K:{} - V{}", unregisterKey, JSONUtil.toJsonStr(serviceMetaInfo));
+        try {
+            kvClient.delete(ByteSequence.from(unregisterKey, StandardCharsets.UTF_8)).get();
+        } catch (Exception e) {
+            log.error("Failed to unregister service", e);
+        }
     }
 
     @Override
     public List<ServiceMetaInfo> serviceDiscovery(String serviceKey) {
-        // 前缀搜索，结尾一定要加 '/'
-        String searchPrefix = ETCD_ROOT_PATH + serviceKey + "/";
+        // 前缀搜索，结尾一定 【不要！】 要加 '/'
+        String searchPrefix = ETCD_ROOT_PATH + serviceKey;
+        log.info("search key: {}", searchPrefix);
 
         try {
             // 前缀查询
@@ -65,6 +77,7 @@ public class EtcdRegistry implements Registry {
                             getOption)
                     .get()
                     .getKvs();
+            log.info("Found {} keys for prefix {}", keyValues.size(), searchPrefix);
             // 解析服务信息
             return keyValues.stream()
                     .map(keyValue -> {
@@ -88,5 +101,6 @@ public class EtcdRegistry implements Registry {
             client.close();
         }
     }
+
 }
 
