@@ -21,6 +21,9 @@ public class RPCApplication {
         Registry registry = RegistryFactory.getInstance(registryConfig.getRegistry());
         registry.init(registryConfig);
         log.info("registry init, config = {}", registryConfig);
+
+        // destroy service when shutdown
+        Runtime.getRuntime().addShutdownHook(new Thread(registry::destroy));
     }
 
     public static void init() {

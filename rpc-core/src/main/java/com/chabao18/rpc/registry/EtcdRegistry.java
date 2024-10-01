@@ -97,7 +97,15 @@ public class EtcdRegistry implements Registry {
 
     @Override
     public void destroy() {
-        log.info("current node offline");
+        for (String key : localRegisterNodeKeySet) {
+            try {
+                log.info("service offline: {}", key);
+                kvClient.delete(ByteSequence.from(key, StandardCharsets.UTF_8)).get();
+            } catch (Exception e) {
+                log.error("service offline failed: {}", e.getMessage());
+                throw new RuntimeException(key + "offline failed");
+            }
+        }
         // 释放资源
         if (kvClient != null) {
             kvClient.close();
