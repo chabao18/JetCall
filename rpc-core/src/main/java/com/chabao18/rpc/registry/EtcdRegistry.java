@@ -30,6 +30,8 @@ public class EtcdRegistry implements Registry {
     // the set of node keys registered, used for renewal
     private final Set<String> localRegisterNodeKeySet = new HashSet<>();
 
+    private final RegistryServiceCache cache = new RegistryServiceCache();
+
     @Override
     public void init(RegistryConfig registryConfig) {
         client = Client.builder().endpoints(registryConfig.getAddress()).connectTimeout(Duration.ofMillis(registryConfig.getTimeout())).build();
@@ -72,6 +74,9 @@ public class EtcdRegistry implements Registry {
 
     @Override
     public List<ServiceMetaInfo> serviceDiscovery(String serviceKey) {
+        // todo get cache first
+        // code here ...
+
         String searchPrefix = ETCD_ROOT_PATH + serviceKey;
 
         try {
