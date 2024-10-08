@@ -20,6 +20,6 @@ public class ConsumerExample {
             System.out.println("user == null");
         }
 
-        System.out.println(userService.getNumber());;
+        // System.out.println(userService.getNumber());;
     }
 }
