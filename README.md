@@ -1,3 +1,3 @@
 # JetCall
 
-todo: 负载均衡优化
+todo: 7.2 tcp client
