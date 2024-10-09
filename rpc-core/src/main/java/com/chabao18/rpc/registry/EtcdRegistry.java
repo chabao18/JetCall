@@ -74,8 +74,10 @@ public class EtcdRegistry implements Registry {
 
     @Override
     public List<ServiceMetaInfo> serviceDiscovery(String serviceKey) {
-        // todo get cache first
-        // code here ...
+        List<ServiceMetaInfo> cachedServiceMetaInfoList = cache.readCache();
+        if (cachedServiceMetaInfoList != null) {
+            return cachedServiceMetaInfoList;
+        }
 
         String searchPrefix = ETCD_ROOT_PATH + serviceKey;
 
