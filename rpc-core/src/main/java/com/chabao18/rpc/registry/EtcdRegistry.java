@@ -137,7 +137,7 @@ public class EtcdRegistry implements Registry {
     @Override
     public void heartBeat() {
         // re-register every 10 seconds
-        CronUtil.schedule("*/10 * * * * *", new Task() {
+        CronUtil.schedule("0 */3 * * * *", new Task() {
             @Override
             public void execute() {
                 log.info("start re-register process");
