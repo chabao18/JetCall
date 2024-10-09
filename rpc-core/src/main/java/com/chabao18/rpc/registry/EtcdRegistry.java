@@ -1,6 +1,7 @@
 package com.chabao18.rpc.registry;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.cron.CronUtil;
 import cn.hutool.cron.task.Task;
 import cn.hutool.json.JSONUtil;
@@ -9,6 +10,7 @@ import com.chabao18.rpc.model.ServiceMetaInfo;
 import io.etcd.jetcd.*;
 import io.etcd.jetcd.options.GetOption;
 import io.etcd.jetcd.options.PutOption;
+import io.etcd.jetcd.watch.WatchEvent;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
@@ -31,6 +33,8 @@ public class EtcdRegistry implements Registry {
     private final Set<String> localRegisterNodeKeySet = new HashSet<>();
 
     private final RegistryServiceCache cache = new RegistryServiceCache();
+
+    private final Set<String> watchingKeySet = new ConcurrentHashSet<>();
 
     @Override
     public void init(RegistryConfig registryConfig) {
@@ -74,6 +78,7 @@ public class EtcdRegistry implements Registry {
 
     @Override
     public List<ServiceMetaInfo> serviceDiscovery(String serviceKey) {
+        // get service from cache first
         List<ServiceMetaInfo> cachedServiceMetaInfoList = cache.readCache();
         if (cachedServiceMetaInfoList != null) {
             return cachedServiceMetaInfoList;
@@ -91,12 +96,18 @@ public class EtcdRegistry implements Registry {
                     .getKvs();
             log.info("found {} keys for prefix {}", keyValues.size(), searchPrefix);
             // 解析服务信息
-            return keyValues.stream()
+            List<ServiceMetaInfo> serviceMetaInfoList = keyValues.stream()
                     .map(keyValue -> {
+                        String key = keyValue.getKey().toString(StandardCharsets.UTF_8);
+                        // watch key
+                        watch(key);
                         String value = keyValue.getValue().toString(StandardCharsets.UTF_8);
                         return JSONUtil.toBean(value, ServiceMetaInfo.class);
                     })
                     .collect(Collectors.toList());
+            // write cache
+            cache.writeCache(serviceMetaInfoList);
+            return serviceMetaInfoList;
         } catch (Exception e) {
             throw new RuntimeException("failed to get service list", e);
         }
@@ -153,6 +164,26 @@ public class EtcdRegistry implements Registry {
 
         CronUtil.setMatchSecond(true);
         CronUtil.start();
+    }
+
+    @Override
+    public void watch(String serviceNodeKey) {
+        Watch watchClient = client.getWatchClient();
+        boolean newWatch = watchingKeySet.add(serviceNodeKey);
+        if (newWatch) {
+            watchClient.watch(ByteSequence.from(serviceNodeKey, StandardCharsets.UTF_8), response -> {
+               for (WatchEvent event : response.getEvents()) {
+                   switch (event.getEventType()) {
+                       case DELETE:
+                           cache.clearCache();
+                           break;
+                       case PUT:
+                       default:
+                           break;
+                   }
+               }
+            });
+        }
     }
 
 }
