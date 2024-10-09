@@ -81,6 +81,7 @@ public class EtcdRegistry implements Registry {
         // get service from cache first
         List<ServiceMetaInfo> cachedServiceMetaInfoList = cache.readCache();
         if (cachedServiceMetaInfoList != null) {
+            log.info("serviceDiscovery hit cache");
             return cachedServiceMetaInfoList;
         }
 
