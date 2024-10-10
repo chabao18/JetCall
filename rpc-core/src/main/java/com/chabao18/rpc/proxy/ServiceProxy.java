@@ -49,13 +49,12 @@ public class ServiceProxy implements InvocationHandler {
             log.info("service key: {}", serviceMetaInfo.getServiceKey());
             List<ServiceMetaInfo> serviceMetaInfoList = registry.serviceDiscovery(serviceMetaInfo.getServiceKey());
             if (CollUtil.isEmpty(serviceMetaInfoList)) {
-                throw new RuntimeException("暂无服务地址");
+                throw new RuntimeException("no service available");
             }
             ServiceMetaInfo smi = serviceMetaInfoList.get(0);
 
 
             // send request
-            // todo need Service Discovery
             try (HttpResponse httpResponse = HttpRequest.post(smi.getServiceAddress())
                          .body(bodyBytes)
                          .execute()) {
