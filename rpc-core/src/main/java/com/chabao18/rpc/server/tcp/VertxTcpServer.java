@@ -1,12 +1,13 @@
-package com.chabao18.rpc.server;
+package com.chabao18.rpc.server.tcp;
 
+import com.chabao18.rpc.server.HttpServer;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetServer;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class VertxTcpServer implements HttpServer{
+public class VertxTcpServer implements HttpServer {
     private byte[] handleRequest(byte[] request) {
         // TODO: handle request
         return "Hello from Vert.x TCP server!".getBytes();
