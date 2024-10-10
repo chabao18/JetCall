@@ -1,16 +1,18 @@
 package com.chabao18.rpc.protocol;
 
 import cn.hutool.core.util.ObjectUtil;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Getter
 public enum ProtocolMessageSerializerEnum {
     JDK(0, "jdk"),
     JSON(1, "json"),
     PROTOBUF(2, "protobuf"),
-    HESSION(3, "hession");
+    HESSIAN(3, "hessian");
 
     private final int key;
 

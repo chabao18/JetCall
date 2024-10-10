@@ -1,10 +1,13 @@
 package com.chabao18.rpc.protocol;
 
+import lombok.Getter;
+
+@Getter
 public enum ProtocolMessageTypeEnum {
     REQUEST(0),
     RESPONSE(1),
-    HEARTBEAT(2),
-    OTHER(3);
+    HEART_BEAT(2),
+    OTHERS(3);
 
     private final int key;
     ProtocolMessageTypeEnum(int key) {

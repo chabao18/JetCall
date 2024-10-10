@@ -1,5 +1,8 @@
 package com.chabao18.rpc.protocol;
 
+import lombok.Getter;
+
+@Getter
 public enum ProtocolMessageStatusEnum {
     OK("ok", 20),
     BAD_REQUEST("bad request", 40),
