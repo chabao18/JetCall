@@ -1,6 +1,7 @@
 package com.chabao18.rpc.proxy;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.chabao18.rpc.RPCApplication;
@@ -9,17 +10,24 @@ import com.chabao18.rpc.constant.RPCConstant;
 import com.chabao18.rpc.model.RPCRequest;
 import com.chabao18.rpc.model.RPCResponse;
 import com.chabao18.rpc.model.ServiceMetaInfo;
+import com.chabao18.rpc.protocol.*;
 import com.chabao18.rpc.registry.Registry;
 import com.chabao18.rpc.registry.RegistryFactory;
 import com.chabao18.rpc.serializer.JDKSerializer;
 import com.chabao18.rpc.serializer.Serializer;
 import com.chabao18.rpc.serializer.SerializerFactory;
+import com.chabao18.rpc.server.tcp.VertxTcpClient;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.net.NetClient;
+import io.vertx.core.net.NetSocket;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 public class ServiceProxy implements InvocationHandler {
@@ -54,7 +62,7 @@ public class ServiceProxy implements InvocationHandler {
             ServiceMetaInfo smi = serviceMetaInfoList.get(0);
 
 
-            // send request
+            // send http request
             try (HttpResponse httpResponse = HttpRequest.post(smi.getServiceAddress())
                          .body(bodyBytes)
                          .execute()) {
@@ -63,6 +71,11 @@ public class ServiceProxy implements InvocationHandler {
                 RPCResponse rpcResponse = serializer.deserialize(result, RPCResponse.class);
                 return rpcResponse.getData();
             }
+
+            // todo[tcp]: send tcp request
+//            RPCResponse rpcResponse = VertxTcpClient.doRequest(rpcRequest, smi);
+//            return rpcResponse.getData();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
