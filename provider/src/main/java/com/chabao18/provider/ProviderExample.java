@@ -10,6 +10,7 @@ import com.chabao18.rpc.registry.LocalRegistry;
 import com.chabao18.rpc.registry.Registry;
 import com.chabao18.rpc.registry.RegistryFactory;
 import com.chabao18.rpc.server.VertxHttpServer;
+import com.chabao18.rpc.server.tcp.VertxTcpServer;
 
 public class ProviderExample {
     public static void main(String[] args) {
@@ -37,6 +38,9 @@ public class ProviderExample {
         // start web server
         VertxHttpServer httpServer = new VertxHttpServer();
         httpServer.doStart(RPCApplication.getRpcConfig().getServerPort());
+        // todo[tcp]
+        // VertxTcpServer vertxTcpServer = new VertxTcpServer();
+        // vertxTcpServer.doStart(RPCApplication.getRpcConfig().getServerPort());
 
     }
 
