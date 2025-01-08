@@ -33,6 +33,18 @@ import java.util.concurrent.CompletableFuture;
 public class ServiceProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // 拦截 Object 的方法（idea 打断点查看对象时会调用toString方法，也会调用invoke，因此要忽略掉）
+        if (method.getDeclaringClass() == Object.class) {
+            if ("toString".equals(method.getName())) {
+                return proxy.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(proxy));
+            }
+            if ("hashCode".equals(method.getName())) {
+                return System.identityHashCode(proxy);
+            }
+            if ("equals".equals(method.getName()) && args != null && args.length == 1) {
+                return proxy == args[0];
+            }
+        }
         // choose serializer
         final Serializer serializer = SerializerFactory.getInstance(RPCApplication.getRpcConfig().getSerializer());
 
