@@ -23,7 +23,7 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
         // choose serializer
         final Serializer serializer = SerializerFactory.getInstance(RPCApplication.getRpcConfig().getSerializer());
 
-        log.info("Received request: {} {}", request.method(), request.uri());
+        log.debug("Received request: {} {}", request.method(), request.uri());
 
         // handle http request
         request.bodyHandler(body -> {

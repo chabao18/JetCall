@@ -7,6 +7,9 @@ import cn.hutool.http.HttpResponse;
 import com.chabao18.rpc.RPCApplication;
 import com.chabao18.rpc.config.RPCConfig;
 import com.chabao18.rpc.constant.RPCConstant;
+import com.chabao18.rpc.loadbalancer.ConsistentHashLoadBalancer;
+import com.chabao18.rpc.loadbalancer.LoadBalancer;
+import com.chabao18.rpc.loadbalancer.RRLoadBalancer;
 import com.chabao18.rpc.model.RPCRequest;
 import com.chabao18.rpc.model.RPCResponse;
 import com.chabao18.rpc.model.ServiceMetaInfo;
@@ -26,7 +29,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -65,14 +70,19 @@ public class ServiceProxy implements InvocationHandler {
             ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
             serviceMetaInfo.setServiceName(serviceName);
             serviceMetaInfo.setServiceVersion(RPCConstant.DEFAULT_SERVICE_VERSION);
-            // fix bug
-            log.info("service key: {}", serviceMetaInfo.getServiceKey());
+
+            log.debug("service key: {}", serviceMetaInfo.getServiceKey());
             List<ServiceMetaInfo> serviceMetaInfoList = registry.serviceDiscovery(serviceMetaInfo.getServiceKey());
             if (CollUtil.isEmpty(serviceMetaInfoList)) {
                 throw new RuntimeException("no service available");
             }
-            ServiceMetaInfo smi = serviceMetaInfoList.get(0);
 
+            // ServiceMetaInfo smi = serviceMetaInfoList.get(0);
+            LoadBalancer loadBalancer = new RRLoadBalancer();
+            Map<String, Object> requestParams = new HashMap<>();
+            requestParams.put("methodName", rpcRequest.getMethodName());
+            ServiceMetaInfo smi = loadBalancer.select(requestParams, serviceMetaInfoList);
+            log.debug("[负载均衡-{}]：{}", serviceMetaInfoList.size() ,smi.getServiceNodeKey());
 
             // send http request
             try (HttpResponse httpResponse = HttpRequest.post(smi.getServiceAddress())

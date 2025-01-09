@@ -38,6 +38,22 @@ public class ProviderExample {
         // start web server
         VertxHttpServer httpServer = new VertxHttpServer();
         httpServer.doStart(RPCApplication.getRpcConfig().getServerPort());
+
+        // 测试负载均衡
+        for (int i = 18081; i <= 18085; i++) {
+            ServiceMetaInfo serviceMetaInfo1 = new ServiceMetaInfo();
+            serviceMetaInfo1.setServiceName(serviceName);
+            serviceMetaInfo1.setServiceHost(rpcConfig.getServerHost());
+            serviceMetaInfo1.setServicePort(i);
+            try {
+                registry.register(serviceMetaInfo1);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            VertxHttpServer server = new VertxHttpServer();
+            server.doStart(i);
+        }
+
         // todo[tcp]
         // VertxTcpServer vertxTcpServer = new VertxTcpServer();
         // vertxTcpServer.doStart(RPCApplication.getRpcConfig().getServerPort());

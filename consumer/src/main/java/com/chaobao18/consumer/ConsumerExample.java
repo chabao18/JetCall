@@ -10,16 +10,17 @@ public class ConsumerExample {
     public static void main(String[] args) {
 
         UserService userService = ServiceProxyFactory.getProxy(UserService.class);
-        User user = new User();
-        user.setName("chabao18");
+        for (int i = 1; i <= 10; i++) {
+            User user = new User();
+            user.setName("chabao18 - Test " + i);
 
-        User newUser = userService.getUser(user);
-        if (newUser != null) {
-            System.out.println(newUser.getName());
-        } else {
-            System.out.println("user == null");
+            User newUser = userService.getUser(user);
+            System.out.println("Request " + i + ":");
+            if (newUser != null) {
+                System.out.println("Response: " + newUser.getName());
+            } else {
+                System.out.println("Response: user == null");
+            }
         }
-
-        // System.out.println(userService.getNumber());;
     }
 }
