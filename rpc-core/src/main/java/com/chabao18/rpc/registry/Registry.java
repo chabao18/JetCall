@@ -5,8 +5,6 @@ package com.chabao18.rpc.registry;
 import com.chabao18.rpc.config.RegistryConfig;
 import com.chabao18.rpc.model.ServiceMetaInfo;
 
-import java.util.List;
-
 
 public interface Registry {
 
@@ -16,7 +14,7 @@ public interface Registry {
 
     void unRegister(ServiceMetaInfo serviceMetaInfo);
 
-    List<ServiceMetaInfo> serviceDiscovery(String serviceKey);
+    ServiceMetaInfo serviceDiscovery(String serviceKey);
 
     void destroy();
 

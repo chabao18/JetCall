@@ -6,6 +6,8 @@ import cn.hutool.cron.CronUtil;
 import cn.hutool.cron.task.Task;
 import cn.hutool.json.JSONUtil;
 import com.chabao18.rpc.config.RegistryConfig;
+import com.chabao18.rpc.loadbalancer.ConsistentHashLoadBalancer;
+import com.chabao18.rpc.loadbalancer.LoadBalancer;
 import com.chabao18.rpc.model.ServiceMetaInfo;
 import io.etcd.jetcd.*;
 import io.etcd.jetcd.options.GetOption;
@@ -35,6 +37,8 @@ public class EtcdRegistry implements Registry {
     private final RegistryServiceCache cache = new RegistryServiceCache();
 
     private final Set<String> watchingKeySet = new ConcurrentHashSet<>();
+
+    private final LoadBalancer loadBalancer = new ConsistentHashLoadBalancer();
 
     @Override
     public void init(RegistryConfig registryConfig) {
@@ -77,12 +81,12 @@ public class EtcdRegistry implements Registry {
     }
 
     @Override
-    public List<ServiceMetaInfo> serviceDiscovery(String serviceKey) {
+    public ServiceMetaInfo serviceDiscovery(String serviceKey) {
         // get service from cache first
         List<ServiceMetaInfo> cachedServiceMetaInfoList = cache.readCache();
         if (cachedServiceMetaInfoList != null) {
             log.debug("serviceDiscovery hit cache");
-            return cachedServiceMetaInfoList;
+            return loadBalancer.select(serviceKey, cachedServiceMetaInfoList);
         }
 
         String searchPrefix = ETCD_ROOT_PATH + serviceKey;
@@ -108,7 +112,7 @@ public class EtcdRegistry implements Registry {
                     .collect(Collectors.toList());
             // write cache
             cache.writeCache(serviceMetaInfoList);
-            return serviceMetaInfoList;
+            return loadBalancer.select(serviceKey, serviceMetaInfoList);
         } catch (Exception e) {
             throw new RuntimeException("failed to get service list", e);
         }

@@ -72,17 +72,11 @@ public class ServiceProxy implements InvocationHandler {
             serviceMetaInfo.setServiceVersion(RPCConstant.DEFAULT_SERVICE_VERSION);
 
             log.debug("service key: {}", serviceMetaInfo.getServiceKey());
-            List<ServiceMetaInfo> serviceMetaInfoList = registry.serviceDiscovery(serviceMetaInfo.getServiceKey());
-            if (CollUtil.isEmpty(serviceMetaInfoList)) {
+            ServiceMetaInfo smi = registry.serviceDiscovery(serviceMetaInfo.getServiceKey());
+            if (smi == null) {
                 throw new RuntimeException("no service available");
             }
 
-            // ServiceMetaInfo smi = serviceMetaInfoList.get(0);
-            LoadBalancer loadBalancer = new RRLoadBalancer();
-            Map<String, Object> requestParams = new HashMap<>();
-            requestParams.put("methodName", rpcRequest.getMethodName());
-            ServiceMetaInfo smi = loadBalancer.select(requestParams, serviceMetaInfoList);
-            log.debug("[负载均衡-{}]：{}", serviceMetaInfoList.size() ,smi.getServiceNodeKey());
 
             // send http request
             try (HttpResponse httpResponse = HttpRequest.post(smi.getServiceAddress())

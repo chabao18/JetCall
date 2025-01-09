@@ -10,7 +10,7 @@ public class RRLoadBalancer implements LoadBalancer{
     private static AtomicInteger currentID = new AtomicInteger(0);
 
     @Override
-    public ServiceMetaInfo select(Map<String, Object> requestParams, List<ServiceMetaInfo> serviceMetaInfoList) {
+    public ServiceMetaInfo select(String requestParams, List<ServiceMetaInfo> serviceMetaInfoList) {
         if (serviceMetaInfoList.isEmpty()) {
             return null;
         }
