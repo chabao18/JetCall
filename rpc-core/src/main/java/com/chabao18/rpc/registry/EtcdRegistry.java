@@ -47,8 +47,8 @@ public class EtcdRegistry implements Registry {
     public void register(ServiceMetaInfo serviceMetaInfo) throws Exception {
         Lease leaseClient = client.getLeaseClient();
 
-        // create a 30s lease
-        long leaseId = leaseClient.grant(30).get().getID();
+        // create a 200s lease
+        long leaseId = leaseClient.grant(200).get().getID();
 
         String registerKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
         ByteSequence key = ByteSequence.from(registerKey, StandardCharsets.UTF_8);
@@ -67,7 +67,7 @@ public class EtcdRegistry implements Registry {
     @Override
     public void unRegister(ServiceMetaInfo serviceMetaInfo) {
         String unregisterKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
-        log.info("unregister K:{} - V{}", unregisterKey, JSONUtil.toJsonStr(serviceMetaInfo));
+        log.debug("unregister K:{} - V{}", unregisterKey, JSONUtil.toJsonStr(serviceMetaInfo));
         try {
             kvClient.delete(ByteSequence.from(unregisterKey, StandardCharsets.UTF_8)).get();
         } catch (Exception e) {
@@ -81,7 +81,7 @@ public class EtcdRegistry implements Registry {
         // get service from cache first
         List<ServiceMetaInfo> cachedServiceMetaInfoList = cache.readCache();
         if (cachedServiceMetaInfoList != null) {
-            log.info("serviceDiscovery hit cache");
+            log.debug("serviceDiscovery hit cache");
             return cachedServiceMetaInfoList;
         }
 
@@ -95,7 +95,7 @@ public class EtcdRegistry implements Registry {
                             getOption)
                     .get()
                     .getKvs();
-            log.info("found {} keys for prefix {}", keyValues.size(), searchPrefix);
+            log.debug("found {} keys for prefix {}", keyValues.size(), searchPrefix);
             // 解析服务信息
             List<ServiceMetaInfo> serviceMetaInfoList = keyValues.stream()
                     .map(keyValue -> {
@@ -136,11 +136,11 @@ public class EtcdRegistry implements Registry {
 
     @Override
     public void heartBeat() {
-        // re-register every 10 seconds
+        // re-register every 3 minutes
         CronUtil.schedule("0 */3 * * * *", new Task() {
             @Override
             public void execute() {
-                log.info("start re-register process");
+                log.debug("start re-register process");
                 for (String key : localRegisterNodeKeySet) {
                     try {
                         List<KeyValue> kvs = kvClient.get(ByteSequence.from(key, StandardCharsets.UTF_8))
