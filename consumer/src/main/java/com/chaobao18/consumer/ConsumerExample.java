@@ -10,7 +10,7 @@ public class ConsumerExample {
     public static void main(String[] args) {
 
         UserService userService = ServiceProxyFactory.getProxy(UserService.class);
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 1; i++) {
             User user = new User();
             user.setName("chabao18 - Test " + i);
 
